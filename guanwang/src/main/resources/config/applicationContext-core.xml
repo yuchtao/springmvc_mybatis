@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-4.0.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<context:annotation-config/>
+	<context:component-scan base-package="com.site.service"/>
+
+
+	<context:property-placeholder location="classpath:config/datasource.properties" ignore-unresolvable="true" /><!--数据源配置-->
+
+    <import resource="classpath:config/db.xml"/>
+
+ 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="com.site.domain" />
+		<property name="mapperLocations" value="classpath:config/mappers/*.xml" />
+	</bean>
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.site.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+     <!--配置事务管理器-->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!--需要回滚的方法-->
+	<tx:advice id="serviceAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!--当代理的service层中的方法抛出异常的时候才回滚,必须加rollback-for参数-->
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Throwable" />
+
+			<tx:method name="insert*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="update*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+
+			<tx:method name="delete*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<!--除了上面标识的方法,其他方法全是只读方法-->
+		</tx:attributes>
+	</tx:advice>
+
+	 <!--配置哪些类的方法需要进行事务管理-->
+	<aop:config>
+		<aop:pointcut id="servicePointcut"
+			expression="execution(* com.site.service.impl.*.*(..))" />
+		<aop:advisor advice-ref="serviceAdvice" pointcut-ref="servicePointcut" />
+	</aop:config>
+    <tx:annotation-driven transaction-manager="transactionManager" />
+</beans>
+
+
+

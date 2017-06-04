@@ -1,0 +1,30 @@
+###set($layout="layout/layout.vm")
+<form action="${rc.contextPath}/user/userTest" method="post">
+    用户名称
+    <input type="text" name="name" value="$!{name}" id="menuname">&nbsp;&nbsp;
+    <button type="submit">查询</button>&nbsp;&nbsp; <button type="button" id="addnew">添加用户</button>
+</form>
+<table>
+    <tr>
+        <th>用户名</th>
+        <th>密码</th>
+        <th>登录名</th>
+        <th>邮箱</th>
+    </tr>
+    <tr>
+        <td>$user.account</td>
+        <td>$user.password</td>
+        <td>$user.name</td>
+        <td>$user.mailbox</td>
+    </tr>
+</table>
+<input type="hidden" id="page" value="$page"/>
+<div id="paginator" class="inline pull-right page">
+</div>
+<script>
+    $(function () {
+        $('#addnew').click(function(){
+            window.location.href="${rc.contextPath}/user/userTest";
+        });
+    });
+</script>

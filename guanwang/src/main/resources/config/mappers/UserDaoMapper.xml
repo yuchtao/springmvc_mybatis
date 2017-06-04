@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.site.dao.UserDao">
+    <resultMap id="UserMap" type="com.site.domain.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="password" property="password" />
+        <result column="name" property="name" />
+        <result column="mailbox" property="mailbox" />
+        <result column="department" property="department" />
+        <result column="company" property="company" />
+        <result column="contact" property="contact" />
+        <result column="type" property="type" />
+        <result column="contact" property="contact" />
+        <result column="last_login" property="lastLogin" />
+    </resultMap>
+
+    <select id="page" resultMap="UserMap">
+        select id, account, password, mailbox, contact, name, department, company, type, last_login from user limit #{0},#{1}
+    </select>
+
+    <select id="total" resultType="java.lang.Long">
+        select count(id) from user
+    </select>
+
+    <select id="find" resultMap="UserMap" parameterType="java.util.Map" >
+        select id, account, password, mailbox, contact, name, department, company, type, last_login from user where 1=1
+        <if test="id != null">
+            AND id = #{id,jdbcType=BIGINT}
+        </if>
+        <if test="account != null">
+            AND account = #{account,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <insert id="create" parameterType="com.site.domain.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(account, password, mailbox, contact, name, department, company, type, last_login)
+        VALUES (#{account,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{mailbox,jdbcType=VARCHAR},
+         #{contact,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{department,jdbcType=VARCHAR},
+         #{company,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{lastLogin,jdbcType=DATE})
+    </insert>
+
+    <update id="update" parameterType="com.site.domain.User">
+        update user set account = #{account,jdbcType=VARCHAR}, password = #{password,jdbcType=VARCHAR},
+        mailbox = #{mailbox,jdbcType=VARCHAR},contact = #{contact,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR}, department = #{department,jdbcType=VARCHAR},
+        company = #{company,jdbcType=VARCHAR},type = #{type,jdbcType=VARCHAR},
+        last_login = #{lastLogin,jdbcType=DATE}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from user where id = #{0}
+    </delete>
+</mapper>
